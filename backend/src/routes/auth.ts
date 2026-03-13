@@ -1,13 +1,20 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { timingSafeEqual } from 'crypto';
 
 const router = Router();
 
 // POST /api/auth/login
 router.post('/login', (req: Request, res: Response) => {
     const { password } = req.body;
-    
-    if (password === process.env.AUTH_PASSWORD) {
+
+    const provided = Buffer.from(typeof password === 'string' ? password : '');
+    const expected = Buffer.from(typeof process.env.AUTH_PASSWORD === 'string' ? process.env.AUTH_PASSWORD : '');
+
+    const passwordsMatch =
+        provided.length === expected.length && timingSafeEqual(provided, expected);
+
+    if (passwordsMatch) {
         const token = jwt.sign({ok: true}, process.env.JWT_SECRET!, { expiresIn: '4h' });
         res.cookie('token', token, { httpOnly: true, maxAge: 4 * 60 * 60 * 1000 }); // 4 hours
         res.status(200).json({ success: true});
