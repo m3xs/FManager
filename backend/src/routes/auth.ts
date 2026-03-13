@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { timingSafeEqual } from 'crypto';
 
 const router = Router();
+const isProduction = process.env.NODE_ENV === 'production';
 
 // POST /api/auth/login
 router.post('/login', (req: Request, res: Response) => {
@@ -16,7 +17,12 @@ router.post('/login', (req: Request, res: Response) => {
 
     if (passwordsMatch) {
         const token = jwt.sign({ok: true}, process.env.JWT_SECRET!, { expiresIn: '4h' });
-        res.cookie('token', token, { httpOnly: true, maxAge: 4 * 60 * 60 * 1000 }); // 4 hours
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 4 * 60 * 60 * 1000, // 4 hours
+            sameSite: 'lax',
+            secure: isProduction,
+        });
         res.status(200).json({ success: true});
     } else {
         res.status(401).json({ success: false, message: 'Invalid password' });
@@ -25,7 +31,11 @@ router.post('/login', (req: Request, res: Response) => {
 
 // POST /api/auth/logout
 router.post('/logout', (_req: Request, res: Response) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: isProduction,
+  });
   res.json({ success: true });
 });
 
