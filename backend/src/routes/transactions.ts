@@ -125,7 +125,7 @@ router.patch('/:id', upload.single('receipt'), (req: Request, res: Response) => 
   if (!title || !amount || !date) {
     return res.status(400).json({ error: 'title, amount, and date are required' });
   }
-  
+
   if (req.file) {
     if (tx.receipt_filename) {
       const filePath = path.join(UPLOADS_DIR, tx.receipt_filename || '');

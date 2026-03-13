@@ -1,7 +1,26 @@
+# Dependencies
 node_modules/
-backend/data/
-backend/uploads/
+
+# Build output
 backend/dist/
 frontend/dist/
+
+# Local data
+backend/data/
+backend/uploads/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# macOS
 .DS_Store
-*.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
