@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(lsof -ti :3001 | xargs kill -9 2>/dev/null && echo \"killed\" || echo \"nothing on 3001\")",
+      "Bash(cd /Users/m3xs/Documents/FManager && \\\\\nsed -i '' \"s|from '@fmanager/common/utils'|from '@fmanager/common'|g\" \\\\\n  frontend/src/components/AddTransactionModal.tsx \\\\\n  frontend/src/components/StatsBar.tsx \\\\\n  frontend/src/components/FilterBar.tsx \\\\\n  frontend/src/components/TransactionList.tsx \\\\\n  frontend/src/components/TransactionDetailModal.tsx && \\\\\nsed -i '' \"s|from '@fmanager/common/types'|from '@fmanager/common'|g\" \\\\\n  frontend/src/components/AddTransactionModal.tsx \\\\\n  frontend/src/components/StatsBar.tsx \\\\\n  frontend/src/components/FilterBar.tsx \\\\\n  frontend/src/components/TransactionList.tsx \\\\\n  frontend/src/components/TransactionDetailModal.tsx)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git remote:*)"
+    ]
+  }
+}

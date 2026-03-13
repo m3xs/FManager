@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Transaction, Stats, Filters } from '@fmanager/common';
 import { fetchTransactions, fetchStats } from './api';
@@ -8,6 +8,7 @@ import FilterBar from './components/FilterBar';
 import TransactionList from './components/TransactionList';
 import AddTransactionModal from './components/AddTransactionModal';
 import TransactionDetailModal from './components/TransactionDetailModal';
+import LoginPage from './components/LoginPage';
 
 const DEFAULT_FILTERS: Filters = { category: 'all', from: '', to: '', search: '' };
 
@@ -19,9 +20,18 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [authed, setAuthed] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
 
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState<Transaction | null>(null);
+
+  useEffect(() => {
+    fetchStats()
+      .then(() => setAuthed(true))
+      .catch(() => setAuthed(false))
+      .finally(() => setAuthChecking(false));
+  }, []);
 
   const load = useCallback(async () => {
     setError('');
@@ -37,13 +47,29 @@ export default function App() {
   }, [filters]);
 
   useEffect(() => {
+    if (!authed) return;
     setLoading(true);
     load();
-  }, [load]);
+  }, [load, authed]);
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    setAuthed(false);
+    setTransactions([]);
+    setStats(null);
+  }
 
   function toggleLang() {
     i18n.changeLanguage(i18n.resolvedLanguage === 'de' ? 'en' : 'de');
   }
+
+  if (authChecking) return (
+    <div className="min-h-screen bg-cl-bg flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-cl-accent-mid border-t-cl-accent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
 
   return (
     <div className="min-h-screen bg-cl-bg">
@@ -81,6 +107,14 @@ export default function App() {
             >
               <Plus size={16} />
               {t('header.addTransaction')}
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-xl text-cl-subtle hover:text-cl-muted hover:bg-cl-surface-2 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={16} />
             </button>
           </div>
         </div>
