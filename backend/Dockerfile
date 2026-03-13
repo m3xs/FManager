@@ -5,6 +5,7 @@ WORKDIR /app
 # Copy workspace manifests first for layer caching
 COPY package.json package-lock.json ./
 COPY common/package.json ./common/
+COPY frontend/package.json ./frontend/
 COPY backend/package.json ./backend/
 
 # Install all workspace dependencies
