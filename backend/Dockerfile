@@ -17,6 +17,9 @@ COPY backend/ ./backend/
 
 WORKDIR /app/backend
 
+# Build the backend TypeScript into dist/
+RUN npm run build
+
 EXPOSE 3001
 
-CMD ["npx", "tsx", "src/index.ts"]
+CMD ["node", "dist/index.js"]
