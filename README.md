@@ -28,15 +28,9 @@ A personal finance tracker for managing your daily expenses. Add transactions wi
 
 ## Getting Started
 
-### 1. Install dependencies
+### Option A — Docker (recommended)
 
-```bash
-# From the project root
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### 2. Configure environment
+### 1. Configure environment
 
 Create `backend/.env`:
 
@@ -47,25 +41,35 @@ JWT_SECRET=a_long_random_secret
 
 > `backend/.env` is git-ignored — never commit it.
 
-### 3. Start the backend
+### 2. Build and run
 
 ```bash
-cd backend
-npx tsx src/index.ts
+docker compose up --build
 ```
 
-Runs on **http://localhost:3001**
+App will be available on **http://localhost**.
 
-### 4. Start the frontend
+---
 
-Open a second terminal:
+### Option B — Local dev
+
+### 1. Install dependencies
 
 ```bash
-cd frontend
-npx vite
+npm install
 ```
 
-Runs on **http://localhost:5173** — open this in your browser.
+### 2. Configure environment
+
+Create `backend/.env` as above.
+
+### 3. Start both servers
+
+```bash
+npm run dev
+```
+
+Frontend on **http://localhost:5173**, backend on **http://localhost:3001**.
 
 ## Authentication
 
@@ -97,7 +101,9 @@ All `/api/transactions` routes are protected. Login via `POST /api/auth/login` w
 
 ```
 FManager/
+├── docker-compose.yml
 ├── backend/
+│   ├── Dockerfile
 │   ├── src/
 │   │   ├── index.ts              # Express server (port 3001)
 │   │   ├── db.ts                 # SQLite schema & connection
@@ -110,6 +116,8 @@ FManager/
 │   └── uploads/                  # PDF receipts (auto-created)
 ├── common/                       # Shared types & utils (@fmanager/common)
 └── frontend/
+    ├── Dockerfile
+    ├── nginx.conf                 # Serves SPA + proxies /api to backend
     └── src/
         ├── App.tsx               # Main layout, state & auth gate
         ├── api.ts                # Fetch helpers
