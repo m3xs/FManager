@@ -5,6 +5,8 @@ services:
       dockerfile: backend/Dockerfile
     environment:
       NODE_ENV: production
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - backend-data:/app/backend/data
       - backend-uploads:/app/backend/uploads
