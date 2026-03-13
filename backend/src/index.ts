@@ -17,8 +17,8 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/transactions', authMiddleware, transactionsRouter);
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// Serve uploaded files (protected)
+app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '..', 'uploads')));
 
 app.listen(PORT, () => {
   console.log(`FManager backend running on http://localhost:${PORT}`);
