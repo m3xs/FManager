@@ -32,6 +32,13 @@ const en = {
     salaryPlaceholder: 'e.g. 2500',
     budgetExceeded: 'over budget',
     ofSalary: 'of {{salary}} salary',
+    reveal: 'Show budget',
+    hide: 'Hide budget',
+    hiddenHint: 'Click the eye icon to reveal',
+    warningLabel: 'warning threshold',
+    warningPlaceholder: 'e.g. 80',
+    save: 'Save',
+    cancel: 'Cancel',
   },
   filters: {
     search: 'Search transactions…',

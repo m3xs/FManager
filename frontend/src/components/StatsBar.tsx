@@ -1,4 +1,4 @@
-import { TrendingDown, Receipt, Calendar, Wallet, Pencil, Check, X } from 'lucide-react';
+import { TrendingDown, Receipt, Calendar, Wallet, Pencil, Check, X, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Stats } from '@fmanager/common';
@@ -8,11 +8,15 @@ interface Props {
   stats: Stats;
   salary: number | null;
   onSalaryChange: (value: number | null) => void;
+  salaryWarning: number;
+  onSalaryWarningChange: (value: number) => void;
 }
 
-export default function StatsBar({ stats, salary, onSalaryChange }: Props) {
+export default function StatsBar({ stats, salary, onSalaryChange, salaryWarning, onSalaryWarningChange }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
+  const [draftWarning, setDraftWarning] = useState('');
+  const [revealed, setRevealed] = useState(false);
   const { t, i18n } = useTranslation();
   const locale = i18n.resolvedLanguage === 'de' ? 'de-DE' : 'en-GB';
   const maxMonthTotal = Math.max(...stats.recentMonths.map(m => m.total), 1);
@@ -20,15 +24,19 @@ export default function StatsBar({ stats, salary, onSalaryChange }: Props) {
   const remaining = salary !== null ? salary - stats.thisMonth : null;
   const spentPct = salary && salary > 0 ? Math.min((stats.thisMonth / salary) * 100, 100) : 0;
   const isOver = salary !== null && stats.thisMonth > salary;
+  const isWarning = !isOver && salary !== null && spentPct >= salaryWarning;
 
   function startEdit() {
     setDraft(salary !== null ? String(salary) : '');
+    setDraftWarning(String(salaryWarning));
     setEditing(true);
   }
 
   function commitEdit() {
     const val = parseFloat(draft.replace(',', '.'));
     if (!isNaN(val) && val >= 0) onSalaryChange(val);
+    const warnVal = parseFloat(draftWarning.replace(',', '.'));
+    if (!isNaN(warnVal) && warnVal >= 0 && warnVal <= 100) onSalaryWarningChange(warnVal);
     setEditing(false);
   }
 
@@ -94,58 +102,91 @@ export default function StatsBar({ stats, salary, onSalaryChange }: Props) {
             <span className="text-sm text-cl-muted font-medium">{t('stats.salary')}</span>
           </div>
           {!editing && (
-            <button
-              onClick={startEdit}
-              className="p-1.5 rounded-lg text-cl-subtle hover:text-cl-muted hover:bg-cl-surface-2 transition-colors"
-              title={t('stats.setSalary')}
-            >
-              <Pencil size={14} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setRevealed(r => !r)}
+                className="p-1.5 rounded-lg text-cl-subtle hover:text-cl-muted hover:bg-cl-surface-2 transition-colors"
+                title={revealed ? t('stats.hide') : t('stats.reveal')}
+              >
+                {revealed ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+              <button
+                onClick={startEdit}
+                className="p-1.5 rounded-lg text-cl-subtle hover:text-cl-muted hover:bg-cl-surface-2 transition-colors"
+                title={t('stats.setSalary')}
+              >
+                <Pencil size={14} />
+              </button>
+            </div>
           )}
         </div>
 
         {editing ? (
-          <div className="flex items-center gap-2">
-            <span className="text-cl-muted text-sm">€</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={draft}
-              onChange={e => setDraft(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') cancelEdit(); }}
-              placeholder={t('stats.salaryPlaceholder')}
-              className="flex-1 bg-cl-surface-2 border border-cl-border rounded-lg px-3 py-1.5 text-sm text-cl-text focus:outline-none focus:ring-2 focus:ring-cl-accent"
-              autoFocus
-            />
-            <button onClick={commitEdit} className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors">
-              <Check size={15} />
-            </button>
-            <button onClick={cancelEdit} className="p-1.5 rounded-lg text-cl-subtle hover:bg-cl-surface-2 transition-colors">
-              <X size={15} />
-            </button>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-cl-muted text-sm w-4">€</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                placeholder={t('stats.salaryPlaceholder')}
+                className="flex-1 bg-cl-surface-2 border border-cl-border rounded-lg px-3 py-1.5 text-sm text-cl-text focus:outline-none focus:ring-2 focus:ring-cl-accent"
+                autoFocus
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-cl-muted text-sm w-4">%</span>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                value={draftWarning}
+                onChange={e => setDraftWarning(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') cancelEdit(); }}
+                placeholder={t('stats.warningPlaceholder')}
+                className="flex-1 bg-cl-surface-2 border border-cl-border rounded-lg px-3 py-1.5 text-sm text-cl-text focus:outline-none focus:ring-2 focus:ring-cl-accent"
+              />
+              <span className="text-xs text-cl-subtle whitespace-nowrap">{t('stats.warningLabel')}</span>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={commitEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-emerald-600 hover:bg-emerald-50 transition-colors">
+                <Check size={14} /> {t('stats.save')}
+              </button>
+              <button onClick={cancelEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-cl-subtle hover:bg-cl-surface-2 transition-colors">
+                <X size={14} /> {t('stats.cancel')}
+              </button>
+            </div>
           </div>
         ) : salary !== null ? (
           <>
-            <div className="flex items-end justify-between mb-2">
-              <div>
-                <p className={`text-2xl font-bold ${isOver ? 'text-rose-500' : 'text-emerald-600'}`}>
-                  {remaining !== null ? formatEur(Math.abs(remaining)) : '—'}
-                </p>
-                <p className="text-xs text-cl-subtle mt-0.5">
-                  {isOver ? t('stats.budgetExceeded') : t('stats.remaining')}
-                  {' · '}
-                  {t('stats.ofSalary', { salary: formatEur(salary) })}
-                </p>
-              </div>
-              <span className="text-sm font-medium text-cl-muted">{Math.round(spentPct)}%</span>
-            </div>
-            <div className="h-2 bg-cl-surface-2 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}`}
-                style={{ width: `${spentPct}%` }}
-              />
-            </div>
+            {revealed ? (
+              <>
+                <div className="flex items-end justify-between mb-2">
+                  <div>
+                    <p className={`text-2xl font-bold ${isOver ? 'text-rose-500' : isWarning ? 'text-amber-500' : 'text-emerald-600'}`}>
+                      {remaining !== null ? formatEur(Math.abs(remaining)) : '—'}
+                    </p>
+                    <p className="text-xs text-cl-subtle mt-0.5">
+                      {isOver ? t('stats.budgetExceeded') : t('stats.remaining')}
+                      {' · ' + t('stats.ofSalary', { salary: formatEur(salary) })}
+                    </p>
+                  </div>
+                  <span className="text-sm font-medium text-cl-muted">{Math.round(spentPct)}%</span>
+                </div>
+                <div className="h-2 bg-cl-surface-2 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${isOver ? 'bg-rose-500' : isWarning ? 'bg-amber-400' : 'bg-emerald-500'}`}
+                    style={{ width: `${spentPct}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-cl-subtle">{t('stats.hiddenHint')}</p>
+            )}
           </>
         ) : (
           <button
