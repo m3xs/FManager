@@ -29,11 +29,20 @@ export default function App() {
     const stored = localStorage.getItem('fmanager_salary');
     return stored ? parseFloat(stored) : null;
   });
+  const [salaryWarning, setSalaryWarningState] = useState<number>(() => {
+    const stored = localStorage.getItem('fmanager_salary_warning');
+    return stored ? parseFloat(stored) : 80;
+  });
 
   function setSalary(value: number | null) {
     setSalaryState(value);
     if (value === null) localStorage.removeItem('fmanager_salary');
     else localStorage.setItem('fmanager_salary', String(value));
+  }
+
+  function setSalaryWarning(value: number) {
+    setSalaryWarningState(value);
+    localStorage.setItem('fmanager_salary_warning', String(value));
   }
 
   useEffect(() => {
@@ -138,7 +147,7 @@ export default function App() {
           </div>
         )}
 
-        {stats && <StatsBar stats={stats} salary={salary} onSalaryChange={setSalary} />}
+        {stats && <StatsBar stats={stats} salary={salary} onSalaryChange={setSalary} salaryWarning={salaryWarning} onSalaryWarningChange={setSalaryWarning} />}
 
         <FilterBar filters={filters} onChange={setFilters} />
 

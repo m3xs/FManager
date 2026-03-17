@@ -32,6 +32,13 @@ const de = {
     salaryPlaceholder: 'z. B. 2500',
     budgetExceeded: 'Budget überschritten',
     ofSalary: 'von {{salary}} Gehalt',
+    reveal: 'Budget anzeigen',
+    hide: 'Budget verbergen',
+    hiddenHint: 'Auf das Auge klicken, um anzuzeigen',
+    warningLabel: 'Warnschwelle',
+    warningPlaceholder: 'z. B. 80',
+    save: 'Speichern',
+    cancel: 'Abbrechen',
   },
   filters: {
     search: 'Buchungen suchen…',
