@@ -25,6 +25,16 @@ export default function App() {
 
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState<Transaction | null>(null);
+  const [salary, setSalaryState] = useState<number | null>(() => {
+    const stored = localStorage.getItem('fmanager_salary');
+    return stored ? parseFloat(stored) : null;
+  });
+
+  function setSalary(value: number | null) {
+    setSalaryState(value);
+    if (value === null) localStorage.removeItem('fmanager_salary');
+    else localStorage.setItem('fmanager_salary', String(value));
+  }
 
   useEffect(() => {
     fetchStats()
@@ -128,7 +138,7 @@ export default function App() {
           </div>
         )}
 
-        {stats && <StatsBar stats={stats} />}
+        {stats && <StatsBar stats={stats} salary={salary} onSalaryChange={setSalary} />}
 
         <FilterBar filters={filters} onChange={setFilters} />
 
