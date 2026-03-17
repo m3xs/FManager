@@ -26,6 +26,12 @@ const en = {
     noData: 'No data yet',
     spendingByCategory: 'Spending this month by category',
     lastMonths: 'Last {{count}} months',
+    salary: 'Monthly Salary',
+    remaining: 'Remaining',
+    setSalary: 'Set salary',
+    salaryPlaceholder: 'e.g. 2500',
+    budgetExceeded: 'over budget',
+    ofSalary: 'of {{salary}} salary',
   },
   filters: {
     search: 'Search transactions…',

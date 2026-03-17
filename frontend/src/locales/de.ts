@@ -26,6 +26,12 @@ const de = {
     noData: 'Noch keine Daten',
     spendingByCategory: 'Ausgaben diesen Monat nach Kategorie',
     lastMonths: 'Letzte {{count}} Monate',
+    salary: 'Monatsgehalt',
+    remaining: 'Verbleibend',
+    setSalary: 'Gehalt festlegen',
+    salaryPlaceholder: 'z. B. 2500',
+    budgetExceeded: 'Budget überschritten',
+    ofSalary: 'von {{salary}} Gehalt',
   },
   filters: {
     search: 'Buchungen suchen…',
